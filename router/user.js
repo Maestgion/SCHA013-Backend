@@ -2,14 +2,13 @@ const express = require("express");
 const { verifyTokenAndAuthorization, verifyTokenAndHod, verifyTokenAndFaculty } = require("../middlewares/verifyToken");
 const router = express.Router()
 const bcrypt = require("bcryptjs");
-const User = require("../models/User")
 const Student = require("../models/StudentProfile")
 const Faculty = require("../models/FacultyProfile")
 const Club = require("../models/ClubProfie");
 
 // post student profile
 
-router.post("/student/profile/:id", async (req, res) => {
+router.put("/profile/student/:id", async (req, res) => {
 
     const { firstName, lastName, regNo, dept, section, year, phone } = req.body;
 
@@ -18,21 +17,22 @@ router.post("/student/profile/:id", async (req, res) => {
     }
 
     try {
-        const std = await User.findById(req.params.id)
-        const profile = new Student({
-            firstName,
-            lastName,
-            regNo,
-            dept,
-            section,
-            year,
-            phone,
-            email: std.email
-        })
 
-        await profile.save();
+        const profile = await Student.findByIdAndUpdate(req.params.id, {
+            $set: {
+                firstName,
+                lastName,
+                regNo,
+                dept,
+                section,
+                year,
+                phone,
+                isComplete: true
+            }
+        }, { new: true })
 
-        res.status(201).json({ message: "profile completed" });
+
+        res.status(201).json({ message: "profile completed", profile });
         console.log(profile);
 
 
@@ -46,7 +46,7 @@ router.post("/student/profile/:id", async (req, res) => {
 
 
 
-router.post("/faculty/profile/:id", async (req, res) => {
+router.put("/profile/faculty/:id", async (req, res) => {
 
     const { title, firstName, lastName, regNo, dept, section, phone, facType } = req.body;
 
@@ -55,23 +55,25 @@ router.post("/faculty/profile/:id", async (req, res) => {
     }
 
     try {
-        const fac = await User.findById(req.params.id)
-        console.log(fac.email)
-        const profile = new Faculty({
-            title,
-            firstName,
-            lastName,
-            regNo,
-            dept,
-            section,
-            phone,
-            facType,
-            email: fac.email
-        })
 
-        await profile.save();
+        const profile = await Faculty.findByIdAndUpdate(req.params.id, {
+            $set: {
 
-        res.status(201).json({ message: "profile completed" });
+                title,
+                firstName,
+                lastName,
+                regNo,
+                dept,
+                section,
+                phone,
+                facType,
+                isComplete: true
+
+            }
+        }, { new: true })
+
+
+        res.status(201).json({ message: "profile completed", profile });
         console.log(profile);
 
 
@@ -80,27 +82,30 @@ router.post("/faculty/profile/:id", async (req, res) => {
     }
 })
 
-
 // club profile
 
 
-router.post("/club/profile", async (req, res) => {
+router.put("/profile/club/:id", async (req, res) => {
 
-    const { clubName, startingYear, clubEmail, clubType, mentorTitle, mentorName, dept, deptHod, leadName, leadRegNo, leadPhoneNo } = req.body;
+    const { clubName, startingYear, email, clubType, mentorTitle, mentorName, dept, deptHod, leadName, leadRegNo, leadPhoneNo } = req.body;
 
-    if (!clubName || !startingYear || !clubEmail, !clubType || !mentorTitle || !mentorName || !dept || !deptHod || !leadName || !leadRegNo || !leadPhoneNo) {
+    if (!clubName || !startingYear || !email || !clubType || !mentorTitle || !mentorName || !dept || !deptHod || !leadName || !leadRegNo || !leadPhoneNo) {
         res.status(422).json({ error: "Please fill all the details" });
     }
 
     try {
 
-        const profile = new Club({
-            clubName, startingYear, clubEmail, clubType, mentorTitle, mentorName, dept, deptHod, leadName, leadRegNo, leadPhoneNo
-        })
+        const profile = await Club.findByIdAndUpdate(req.params.id, {
+            $set: {
+                clubName, startingYear, email, clubType, mentorTitle, mentorName, dept, deptHod, leadName, leadRegNo, leadPhoneNo, isComplete: true
 
-        await profile.save();
+            }
+        }, { new: true })
 
-        res.status(201).json({ message: "profile completed" });
+
+
+        res.status(201).json({ message: "profile completed", profile });
+        // res.status(201).json(profile);
         console.log(profile);
 
 
@@ -118,16 +123,21 @@ router.put("/update/:id", verifyTokenAndAuthorization, async (req, res) => {
     }
 
     try {
-        const updatedAccount = await User.findByIdAndUpdate(req.params.id,
-            {
-                $set: req.body
-            }, { new: true })
+        // const updatedAccount = await User.findByIdAndUpdate(req.params.id,
+        //     {
+        //         $set: req.body
+        //     }, { new: true })
 
-        res.status(200).json(updatedAccount)
+        const student = await Student.findById(req.params.id)
+        const faculty = await Faculty.findById(req.params.id)
+        const club = await Club.findById(req.params.id)
+            
 
-        const user = await User.findById(req.params.id)
+        // res.status(200).json(updatedAccount)
 
-        if (user.userType === "student") {
+        // const user = await User.findById(req.params.id)
+
+        if (student.userType === "student") {
             try {
                 const updatedAccount = await Student.findByIdAndUpdate(req.params.id, {
                     $set: req.body
@@ -139,7 +149,7 @@ router.put("/update/:id", verifyTokenAndAuthorization, async (req, res) => {
                 res.status(500).json({ error: "error" })
             }
         }
-        else if (user.userType === "faculty") {
+        else if (faculty.userType === "faculty") {
             try {
                 const updatedAccount = await Faculty.findByIdAndUpdate(req.params.id, {
                     $set: req.body
@@ -151,7 +161,7 @@ router.put("/update/:id", verifyTokenAndAuthorization, async (req, res) => {
                 res.status(500).json({ error: "error" })
             }
         }
-        else if (user.userType === "club") {
+        else if (club.userType === "club") {
             try {
                 const updatedAccount = await Club.findByIdAndUpdate(req.params.id, {
                     $set: req.body
@@ -174,9 +184,9 @@ router.put("/update/:id", verifyTokenAndAuthorization, async (req, res) => {
 
 // get all students
 
-router.get("/students", verifyTokenAndHod, async (req, res) => {
+router.get("/students", verifyTokenAndAuthorization, async (req, res) => {
     try {
-        const students = await Student.find({ isHod: false })
+        const students = await Student.find()
 
         res.status(200).json(students);
     }
@@ -222,7 +232,50 @@ router.get("/faculty/:id", verifyTokenAndFaculty, async (req, res) => {
     }
 })
 
+// get single faculty
 
+router.get("/single/faculty/:id", async (req, res) => {
+
+    try {
+
+        const faculty = await Faculty.findById(req.params.id)
+
+        res.status(200).json(faculty)
+
+    } catch (e) {
+        res.status(500).json({ error: "error" })
+    }
+})
+
+// get single student
+
+router.get("/single/student/:id", async (req, res) => {
+
+    try {
+
+        const student = await Student.findById(req.params.id)
+
+        res.status(200).json(student)
+
+    } catch (e) {
+        res.status(500).json({ error: "error" })
+    }
+})
+
+// get single club
+
+router.get("/single/club/:id", async (req, res) => {
+
+    try {
+
+        const club = await Club.findById(req.params.id)
+
+        res.status(200).json(club)
+
+    } catch (e) {
+        res.status(500).json({ error: "error" })
+    }
+})
 
 
 
@@ -231,7 +284,7 @@ router.get("/faculty/:id", verifyTokenAndFaculty, async (req, res) => {
 
 router.get("/faculties", verifyTokenAndHod, async (req, res) => {
     try {
-        const students = await Faculty.find({ isHod: false })
+        const students = await Faculty.find()
 
         res.status(200).json(students);
     }
@@ -246,7 +299,7 @@ router.get("/faculties", verifyTokenAndHod, async (req, res) => {
 
 router.get("/clubs", verifyTokenAndHod, async (req, res) => {
     try {
-        const students = await Faculty.find({ isHod: false })
+        const students = await Faculty.find()
 
         res.status(200).json(students);
     }
@@ -255,8 +308,6 @@ router.get("/clubs", verifyTokenAndHod, async (req, res) => {
         res.status(500).json({ error: "error" })
     }
 })
-
-
 
 
 

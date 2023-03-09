@@ -2,65 +2,73 @@ const mongoose = require("mongoose")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 
-const facultySchema = new mongoose.Schema({
+const clubSchema = new mongoose.Schema({
     userType: {
         type: String,
-        required: true,
+
     },
     email:
     {
         type: String,
-        required: true,
-        unique: true,
+        sparse: true
     },
     password: {
         type: String,
-        required: true,
+
     },
     cnfPassword: {
         type: String,
-        required: true
+
     },
     isHod: {
         type: Boolean,
         default: false,
     },
-    title:
+    clubName:
     {
         type: String,
 
     },
-    firstName:
+    startingYear:
+    {
+        type: Date,
+
+    },
+    clubType: {
+
+        type: String,
+
+    },
+    mentorTitle:
     {
         type: String,
 
     },
-    lastName:
+    mentorName:
     {
         type: String,
 
-    },
-    regNo:
-    {
-        type: String,
     },
     dept:
     {
         type: String,
 
     },
-    facType: {
-
-        type: String,
-
-    },
-    section:
+    deptHod:
     {
         type: String,
-        default: null,
 
     },
-    phone: {
+    leadName:
+    {
+        type: String,
+
+    },
+    leadRegNo: {
+        type: String,
+
+    },
+    leadPhoneNo: {
         type: Number,
 
     },
@@ -80,13 +88,13 @@ const facultySchema = new mongoose.Schema({
                     required: true
                 }
             }
-        ],
+        ]
 
 
 
-}, { timestamps: true });
+})
 
-facultySchema.pre('save', async function (next) {
+clubSchema.pre('save', async function (next) {
     if (this.isModified('password')) {
         this.password = await bcrypt.hash(this.password, 10)
         this.cnfPassword = await bcrypt.hash(this.cnfPassword, 10)
@@ -95,7 +103,7 @@ facultySchema.pre('save', async function (next) {
     next()
 })
 
-facultySchema.methods.generateToken = async function () {
+clubSchema.methods.generateToken = async function () {
     try {
         let generatedToken = jwt.sign({ _id: this._id, }, process.env.SECRET_KEY)
 
@@ -108,6 +116,8 @@ facultySchema.methods.generateToken = async function () {
     }
 }
 
-const Faculty = mongoose.model("faculty", facultySchema);
 
-module.exports = Faculty
+const Club = mongoose.model("club", clubSchema)
+
+module.exports = Club;
+

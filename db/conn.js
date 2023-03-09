@@ -7,9 +7,12 @@ mongoose.set("strictQuery", false)
 
 const DB = process.env.DATABASE
 
-mongoose.connect(DB,  {useNewUrlParser: true,
-    useUnifiedTopology: true}, ()=>{
-console.log("DB connected!!")
-}, (e)=>{
-    console.log(e);
-})
+
+mongoose.connect(DB, { useNewUrlParser: true })
+  .then(() => {
+    console.log('DB connected successfully!!');
+   
+  })
+  .catch(err => {
+    console.error('DB connection error:', err);
+  });

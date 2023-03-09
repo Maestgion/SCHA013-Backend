@@ -16,6 +16,18 @@ const newProjectRecSchema = new mongoose.Schema({
         type: String, 
         required: true,
     },
+    linkedInProfile:{
+        type: String,
+        required: true,
+    },
+    githubProfile:{
+        type: String,
+        required: true,
+    },
+    resumeLink:{
+        type: String,
+        required: true
+    }
 })
 
 const NewProjectRecruitment = mongoose.model("newProjectRecruitment", newProjectRecSchema)

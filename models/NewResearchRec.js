@@ -13,6 +13,18 @@ const newResearchRecSchema = new mongoose.Schema({
     criteria:{
         type: String,
         required: true
+    },
+    linkedInProfile:{
+        type: String,
+        required: true,
+    },
+    githubProfile:{
+        type: String,
+        required: true,
+    },
+    resumeLink:{
+        type: String,
+        required: true
     }
    
 })
