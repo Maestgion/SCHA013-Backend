@@ -3,30 +3,30 @@ const mongoose = require("mongoose")
 const newProjectRecSchema = new mongoose.Schema({
     projectTitle:
     {
-        type:String,
+        type: String,
         required: true,
     },
     problemStatement:
     {
-        type:String,
+        type: String,
         required: true,
     },
     criteria:
     {
-        type: String, 
-        required: true,
+        type: String
+        // required: true,
     },
-    linkedInProfile:{
-        type: String,
-        required: true,
+    linkedInProfile: {
+        type: String
+        // required: true,
     },
-    githubProfile:{
-        type: String,
-        required: true,
+    githubProfile: {
+        type: String
+        // required: true,
     },
-    resumeLink:{
-        type: String,
-        required: true
+    resumeLink: {
+        type: String
+        // required: true
     }
 })
 
