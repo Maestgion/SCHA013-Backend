@@ -1,6 +1,12 @@
 const mongoose = require("mongoose")
 
 const newProjectRecSchema = new mongoose.Schema({
+    uid: {
+        type: String,
+        unique: true,
+
+
+    },
     projectTitle:
     {
         type: String,

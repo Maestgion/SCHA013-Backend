@@ -75,9 +75,18 @@ router.post("/newProject/recruitment", async (req, res) => {
 //  get project recruitment details (student)
 
 
-router.get("/newProject/:id/recruitment/details", async (req, res) => {
+// router.get("/newProject/:id/recruitment/details", async (req, res) => {
+//     try {
+//         projectRecDetails = await NewProjectRecruitment.findById(req.params.id);
+
+//         res.status(200).json(projectRecDetails)
+//     } catch (e) {
+//         res.status(500).json(e)
+//     }
+// })
+router.get("/allProject", async (req, res) => {
     try {
-        projectRecDetails = await NewProjectRec.findById(req.params.id);
+        projectRecDetails = await NewProjectRecruitment.find();
 
         res.status(200).json(projectRecDetails)
     } catch (e) {
@@ -169,12 +178,12 @@ router.get("/specific", async (req, res) => {
 
 // student application
 
-router.post("/newProject/:id", async (req, res) => {
+router.put("/newProject/:id", async (req, res) => {
 
 
     const { linkedInProfile, githubProfile, resumeLink } = req.body;
 
-    if (!linkedInProfile || !githubProfile || resumeLink) {
+    if (!linkedInProfile || !githubProfile || !resumeLink) {
         res.status(422).json({ error: "Please fill all the details" })
 
     }
@@ -196,9 +205,9 @@ router.get("/newProject/:id", verifyTokenAndFaculty, async (req, res) => {
     try {
         const applicationDetails = await NewProjectRecruitment.findById(req.params.id);
 
-        const { linkedInProfile, githubProfile, resumeLink, ...others } = applicationDetails
+        const { uid, linkedInProfile, githubProfile, resumeLink, ...others } = applicationDetails
 
-        res.status(200).json({ linkedInProfile: linkedInProfile, githubProfile: githubProfile, resumeLink: resumeLink })
+        res.status(200).json({ uid: uid, linkedInProfile: linkedInProfile, githubProfile: githubProfile, resumeLink: resumeLink })
     } catch (e) {
         res.status(500).json(e);
     }
