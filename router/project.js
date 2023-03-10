@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const NewProject = require("../models/NewProject")
-const NewProjectRec = require("../models/NewProjectRecruitement")
 const { verifyTokenAndFaculty, verifyTokenAndAuthorization, verifyTokenAndHod } = require("../middlewares/verifyToken");
 const NewProjectRecruitment = require("../models/NewProjectRecruitement");
 
@@ -48,7 +47,7 @@ router.get("/newProject", async (req, res) => {
 
 // post project Recruitment 
 
-router.post("/newProject/recruitment", verifyTokenAndAuthorization, async (req, res) => {
+router.post("/newProject/recruitment", async (req, res) => {
     const { projectTitle, problemStatement, criteria } = req.body;
 
     if (!projectTitle || !problemStatement || !criteria) {
@@ -57,15 +56,15 @@ router.post("/newProject/recruitment", verifyTokenAndAuthorization, async (req, 
 
     try {
 
-        const newProjectRec = new NewProjectRec({
+        const newProjectRec = new NewProjectRecruitment({
             projectTitle, problemStatement, criteria: criteria
         })
 
         await newProjectRec.save();
 
 
-        res.status(200).json("project recruitment posted");
         console.log(newProjectRec);
+        res.status(200).json("project recruitment posted");
 
     } catch (e) {
         res.status(500).json(e)
@@ -134,36 +133,33 @@ router.get("/newProject/approval/:id", verifyTokenAndFaculty, async (req, res) =
 
 // get ongoing and finished
 
-router.get("/specific", async (req, res)=>{
+router.get("/specific", async (req, res) => {
     const queryOngoing = req.query.ongoing
     const queryPrevious = req.query.previous
 
 
     console.log(queryOngoing)
 
-    
 
-    try{
+
+    try {
         let project
 
-        if(queryOngoing)
-        {
-            project = await NewProject.find({status:"accepted"})
+        if (queryOngoing) {
+            project = await NewProject.find({ status: "accepted" })
 
             res.status(200).json(project);
 
 
         }
-        else if(queryPrevious)
-        {   
+        else if (queryPrevious) {
 
-            project = await NewProject.find({status:"completed"})
+            project = await NewProject.find({ status: "completed" })
 
             res.status(200).json(project);
 
         }
-    }catch(e)
-    {
+    } catch (e) {
         res.status(500).json(e)
     }
 })
